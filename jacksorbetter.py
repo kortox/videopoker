@@ -19,14 +19,21 @@ class JackOrBetterHandSimpleStrategy(HandCalculator):
             return None
 
     def four_for_royal_flush(self):
-        # there is a flush option
+        # There is a flush option
         if self.suit_counts.count(4) == 1:
-            # count how many royals of that suit
+            # Set holds for royals in that suit
             suit_ord = self.suit_counts.index(4)
-            royals_in_flush = 0
-            for c in self.hand:
+            holds = []
+            for c in self.orig_hand:
                 if c.suit_ord == suit_ord and ['10','J','Q','K','A'].count(c.rank) == 1:
-                    royals_in_flush += 1
+                    holds.append(True)
+                else:
+                    holds.append(False)
+            # Only return holds if there were sufficient royals
+            if holds.count(True) == 4:
+                return holds
+            else:
+                return None
             
 
     def get_cards_to_hold_simple(self):
