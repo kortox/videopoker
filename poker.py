@@ -16,11 +16,18 @@ class Card:
                     'Q' : 11,
                     'K' : 12,
                     }
+    suit_value = {
+                  'C' : 0,
+                  'D' : 1,
+                  'H' : 2,
+                  'S' : 3,
+                  }
 
     def __init__(self, rank, suit):
         self.rank = rank
-        self.ord = self.rank_value[self.rank]
+        self.rank_ord = self.rank_value[self.rank]
         self.suit = suit
+        self.suit_ord = self.suit_value[self.suit]
         self.basic = self.rank + self.suit
         if self.rank == '10':
             self.basic = '0' + self.suit
@@ -61,22 +68,32 @@ class Deck:
 
 class HandCalculator:
 
-    def __init__(self, hand, deck_tail):
-        self.hand = hand
+    def __init__(self, hand, deck_tail=None):
+        self.hand = hand[:]
+        self.orig_hand = hand[:] # copy of hand to keep original indexing
         self.hand.sort()
-        self.deck_tail = deck_tail
         #                   A 2 3 4 5 6 7 8 9 0 J Q K
         self.rank_counts = [0,0,0,0,0,0,0,0,0,0,0,0,0]
         self.count_cards_by_rank()
+        self.suit_counts = [0,0,0,0]
+        self.count_cards_by_suit()
 
-    def get_indexes_to_hold(self):
+        
+    def set_hand(self, hand):
+        self.__init__(hand)
+
+    def get_cards_to_hold(self):
         pass
 
     # functions for calculating value of a hand
     def count_cards_by_rank(self):
         for card in self.hand:
-            self.rank_counts[card.ord] += 1
-    
+            self.rank_counts[card.rank_ord] += 1
+
+    def count_cards_by_suit(self):
+        for card in self.hand:
+            self.suit_counts[card.suit_ord] += 1
+
     def is_pair(self):
         if self.rank_counts.count(2) == 1 and self.rank_counts.count(3) == 0:
             return 'pair'
@@ -106,7 +123,7 @@ class HandCalculator:
         #if self.hand[0].rank == 'A' and self.hand[1].rank == '10' and self.hand[2].rank == 'J' and self.hand[3].rank == 'Q' and self.hand[4].rank == 'K':
         #    return 'straight'
         #for i in range(0, len(self.hand) - 1):
-        #   if self.hand[i+1].ord - self.hand[i].ord != 1:
+        #   if self.hand[i+1].rank_ord - self.hand[i].rank_ord != 1:
         #        return None
         #return 'straight'
     
@@ -190,6 +207,26 @@ def prob_test():
         if k != None:
             print k, ' :: ', str(1.0 * v/num_hands * 100)
 
+class VideoPoker:
+    
+    def __init__(self, buy_in=1500):
+        self.deck = Deck()
+        self.hand = []
+        self.deck_tail = []
+        self.credits = buy_in
+    
+    def draw_hand(self):
+        self.deck.shuffle()
+        (self.hand, self.deck_tail) = self.deck.deal_hand_and_deck(5)
+        return self.hand
+    
+    # indicate which indexes w/ True/False
+    def hold_cards(self, indexes_to_hold = [False,False,False,False,False] ):
+        next_cards = self.deck_tail[:indexes_to_hold.count(False)]
+        for i in range(0,len(self.hand)):
+            if indexes_to_hold[i] == False:
+                self.hand[i] = next_cards.pop() # technically not drawing in the "right" order but don't matter
+        return self.hand
 
 if __name__ == "__main__":
     hands = [
@@ -206,7 +243,7 @@ if __name__ == "__main__":
     ]
     answers = []
     for h in hands:
-        calc = HandCalculator(h, None)
+        calc = HandCalculator(h)
         answers.append(calc.best_hand())
         print answers[len(answers)-1], [card.basic for card in h]
     answer_count = {'straight' : 2,
