@@ -1,4 +1,4 @@
 videopoker
 ==========
 
-Library for playing optimal video poker
+Library for playing video poker
