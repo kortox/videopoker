@@ -1,6 +1,6 @@
 #!env python
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(name='videopoker',
       version='1.0',
@@ -8,5 +8,5 @@ setup(name='videopoker',
       author='kortox',
       author_email='kortox@gmail.com',
       url='https://github.com/kortox/videopoker',
-      packages=[],
+      packages=['videopoker'],
      )
