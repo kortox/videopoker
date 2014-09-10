@@ -1,4 +1,5 @@
-from jacksorbetter import JacksOrBetter, JackOrBetterHandStrategy
+#!env python
+from videopoker.jacksorbetter import JacksOrBetter, JackOrBetterHandSimpleStrategy
 import re
 
 class VideoPokerCLI:
@@ -22,7 +23,7 @@ class VideoPokerCLI:
         self.game = self.game_options[option_ids[int(var)]]
     
     def show_player_hand(self, hand):
-        best_hand = JackOrBetterHandStrategy(hand).best_hand()
+        best_hand = JackOrBetterHandSimpleStrategy(hand).best_hand()
         print " ".join([card.basic for card in hand]), " -> ", best_hand
     
     def deal_hand(self):
